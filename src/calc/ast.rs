@@ -1,7 +1,7 @@
 /// 任意の式を表す
 pub enum Expr {
     ConstantVal(ConstantVal),
-    PlusOp(Box<PlusOp>),
+    BinaryOp(Box<BinaryOp>),
 }
 
 impl Expr {
@@ -9,7 +9,7 @@ impl Expr {
     pub fn eval(&self) -> i32 {
         match self {
             Expr::ConstantVal(e) => e.eval(),
-            Expr::PlusOp(e) => e.eval()
+            Expr::BinaryOp(e) => e.eval()
         }
     }
 }
@@ -40,44 +40,63 @@ fn constant_val_test() {
     );
 }
 
-/// 足し算を表す
-pub struct PlusOp {
+/// 演算子種別
+pub enum OpKind {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+/// 二項演算子を表す
+pub struct BinaryOp {
+    // 適応する演算子種別
+    op_kind: OpKind,
     // 演算子の左にある式
     left_expr: Expr,
     // 演算子の右にある式
     right_expr: Expr,
 }
 
-impl PlusOp {
+impl BinaryOp {
     /// PlusOpを生成する
-    pub fn new(left_expr: Expr, right_expr: Expr) -> PlusOp {
-        PlusOp { left_expr, right_expr }
+    pub fn new(op_kind: OpKind, left_expr: Expr, right_expr: Expr) -> BinaryOp {
+        BinaryOp { op_kind, left_expr, right_expr }
     }
 
     /// 足し算を評価する
     pub fn eval(&self) -> i32 {
-        self.left_expr.eval() + self.right_expr.eval()
+        let right = self.right_expr.eval();
+        let left = self.left_expr.eval();
+        match self.op_kind {
+            OpKind::Add => left + right,
+            OpKind::Sub => left - right,
+            OpKind::Mul => left * right,
+            OpKind::Div => left / right
+        }
     }
 }
 
 #[test]
-fn plus_op_test() {
-    // 13+(5+1)の足し算式を生成
-    let plus_op = PlusOp::new(
+fn binary_op_test() {
+    // 13*(5+1)の式を生成
+    let binary_op = BinaryOp::new(
+        OpKind::Mul,
         Expr::ConstantVal(ConstantVal::new(13)),
-        Expr::PlusOp(
+        Expr::BinaryOp(
             Box::new(
-                PlusOp::new(
+                BinaryOp::new(
+                    OpKind::Add,
                     Expr::ConstantVal(ConstantVal::new(5)),
                     Expr::ConstantVal(ConstantVal::new(1)),
                 )
             )
         ),
     );
-    let expect = 13 + (5 + 1);
+    let expect = 13 * (5 + 1);
 
     assert_eq!(
-        plus_op.eval(),
+        binary_op.eval(),
         expect
     );
 }

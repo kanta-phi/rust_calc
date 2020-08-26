@@ -1,4 +1,5 @@
 /// 任意の式を表す
+#[derive(Debug, PartialEq)]
 pub enum Expr {
     ConstantVal(ConstantVal),
     BinaryOp(Box<BinaryOp>),
@@ -15,6 +16,7 @@ impl Expr {
 }
 
 /// 定数を表す
+#[derive(Debug, PartialEq)]
 pub struct ConstantVal(i32);
 
 impl ConstantVal {
@@ -41,6 +43,7 @@ fn constant_val_test() {
 }
 
 /// 演算子種別
+#[derive(Debug, PartialEq)]
 pub enum OpKind {
     Add,
     Sub,
@@ -49,6 +52,7 @@ pub enum OpKind {
 }
 
 /// 二項演算子を表す
+#[derive(Debug, PartialEq)]
 pub struct BinaryOp {
     // 適応する演算子種別
     op_kind: OpKind,
